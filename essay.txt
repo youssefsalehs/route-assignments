@@ -1,0 +1,28 @@
+1- 
+forEach =>high order function (array method), it receives callback function in it and i can access with the index
+for....of=> looping ,it shows each value of iterable objects and i can't access index directly in it i should use .entries()
+--------------------------------------
+2-
+hoisting is a  behavior where JS creating declarations before code execution begins.
+tdz is the time between entering a scope, reaching the declaration of a let, const.
+---------------------------------------------------------------------
+3-
+"==" => comparison operator used to compare between values only (type coercion occurs first)
+"===" => comparison operator used to compare between values and data type (no type coercion is allowed)
+----------------------------------------------
+4-
+it's important to protect program from crashing and async functions may fail [calling api or from db] so catch block captures the error and from it we protected the program from crashing we're able
+to log errors or show appropriate error messages
+--------------------------
+5-
+type coercion=> done automatically by JS example:
+
+let x='1';
+let y=2;
+console.log(x+y); //'12' [of type string ]as one of the operands is string
+
+type conversion=> done manually by the user example:
+let a='1';
+let b=2;
+let res=Number(a)+b;
+console.log(res);//3 [of type number]
