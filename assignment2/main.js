@@ -1,8 +1,8 @@
 const path = require("node:path");
 const fs = require("node:fs");
 const { EventEmitter } = require('node:events')
-const os = require("os");
-
+const os = require("node:os");
+const zlib = require("node:zlib");
 //1)
 function logFileAndDirectory() {
   const filePath = path.resolve(__filename);
@@ -168,3 +168,18 @@ function copyFile(source, destination) {
   });
 }
 copyFile("./big.txt", "./dest.txt");
+//20)
+function compress(source, destination) {
+  const readStream = fs.createReadStream(source)
+  const gzip = zlib.createGzip();
+  const writeStream = fs.createWriteStream(destination);
+
+  readStream
+    .pipe(gzip)
+    .pipe(writeStream);
+
+  readStream.on("end", () => {
+    console.log("File compressed successfully.");
+  });
+}
+compress('./big.txt','./big.txt.gz')
