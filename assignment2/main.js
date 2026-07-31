@@ -136,3 +136,35 @@ function deviceDetails() {
   return {Platform: os.platform(), Arch: os.arch()}
 }
 console.log(deviceDetails())
+
+//18)
+function readFileInChunks(filePath) {
+  const readStream = fs.createReadStream(filePath, {
+    encoding: "utf8",
+  });
+
+  readStream.on("data", (chunk) => {
+    console.log("Chunk:");
+    console.log(chunk);
+    console.log(("===================================================="))
+  });
+
+  readStream.on("end", () => {
+    console.log("Finished reading file.");
+  });
+}
+
+readFileInChunks("./big.txt");
+
+//19)
+function copyFile(source, destination) {
+  const readStream = fs.createReadStream(source);
+  const writeStream = fs.createWriteStream(destination);
+
+  readStream.pipe(writeStream);
+
+  readStream.on("end", () => {
+    console.log("File copied using streams");
+  });
+}
+copyFile("./big.txt", "./dest.txt");
