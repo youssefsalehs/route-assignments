@@ -1,4 +1,7 @@
-const path = require("path");
+const path = require("node:path");
+const fs = require("node:fs");
+const { EventEmitter } = require('node:events')
+const os = require("os");
 
 //1)
 function logFileAndDirectory() {
@@ -65,3 +68,71 @@ const pathJoiner = (path1, path2) => {
   return path.join(path1, path2);
 };
 console.log(pathJoiner("/folder1", "folder2/file.txt"));
+//10)
+const fileRemove = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("Error deleting file:", err.message);
+      return;
+    }
+
+    console.log(`${filePath} was deleted.`);
+  });
+};
+
+// fileRemove('./m.txt')
+//11)
+function createFolder(folderPath) {
+  try {
+    fs.mkdirSync(folderPath);
+    console.log("Success");
+  } catch (err) {
+    console.error("Error creating folder:", err.message);
+  }
+}
+createFolder("./newFolder");
+//12)
+const startEvent = new EventEmitter();
+startEvent.on('start', () => {
+  console.log('welcome event triggered!')
+})
+startEvent.emit('start')
+//13)
+const loginEvent = new EventEmitter();
+loginEvent.on('login', (name) => {
+  console.log(`user Logged in : ${name}`)
+})
+loginEvent.emit('login',"Youssef")
+//14)
+function fileReader(filePath) {
+  try {
+    const data = fs.readFileSync(filePath,{encoding:'utf-8'});
+    console.log(`the file content => ${data}`)
+  }
+  catch (err) {
+    console.log(err.message)
+  }
+}
+fileReader('./notes.txt')
+//15)
+function writeAsync(fileName, data) {
+  fs.writeFile(fileName, data, { flag: "a" }, (err) => {
+    if (err) {
+      return console.log(err.message);
+    }
+    console.log("Data written successfully.");
+  });
+}
+writeAsync("./async.txt", "Async save")
+
+//16)
+function checkIfExists(filePath) {
+  return fs.existsSync(filePath)
+}
+console.log(checkIfExists('./m.txt'))
+
+//17)
+function deviceDetails() {
+  return {Platform: os.platform(), Arch: os.arch()}
+}
+console.log(deviceDetails())
