@@ -7,9 +7,8 @@ const PORT = 8000;
 //create server
 const server = http.createServer(async (req, res) => {
   const pathname = url.parse(req.url).pathname;
-  console.log(pathname);
   const method = req.method;
-  console.log(method);
+
   //get all users
   if (pathname === "/user" && method === "GET") {
     const users = await userRepository.getAllUsers();
