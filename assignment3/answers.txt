@@ -1,0 +1,31 @@
+1- 
+it's a mechanism where it checks if the call stack is empty and executes that work in a specific, predictable order. It's what allows Node to handle thousands of concurrent connections without spawning a thread per connection.
+-------------------------------------
+2-
+libuv is a C library that Node.js is built on top of. It provides:
+The event loop implementation itself
+A thread pool for offloading operations that can't be done asynchronously at the OS level (like file system access, DNS lookups, some crypto)
+In short: js is single-threaded, but Node.js as a runtime isn't. libuv is the layer underneath that does the actual asynchronous heavy lifting.
+-------------------------------------
+3-When you call an async function:
+the operations runs on libuv
+libuv decides how to handle it:
+-Network I/O (HTTP requests, sockets): handled via the OS
+-File system, DNS lookups (dns.lookup), some crypto: these don't have good async OS primitives on all platforms.
+js code continues executing (it doesn't block).
+When the operation completes, libuv places the next callback into  event loop .
+On a future tick of the event loop, once the call stack is empty, that callback is picked up and executed.
+-------------------------------------
+4-
+call stack: where synchronous js code is executed ,function callbacks are pushed on, and popped off when they return.one thing runs at a time here.
+event queue: where callbacks from completed async operations wait until the call stack is empty and it's their turn to run.
+event loop: it continuously checks if the call stack empty, If so, pull the next callback and push it onto the call stack to execute.
+-------------------------------------
+5-
+The thread pool (provided by libuv) is a set of worker threads (default: 4) used to run operations that would block the event loop:
+-dns.lookup()
+-crypto functions
+-zlib compression functions
+-async methods[fs]
+These tasks are handed off to a thread pool thread, run there, and the result/callback is queued back onto the event queue when done.
+To change the size, set the UV_THREADPOOL_SIZE environment variable before the Node process starts .
