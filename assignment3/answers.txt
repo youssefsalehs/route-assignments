@@ -29,3 +29,7 @@ The thread pool (provided by libuv) is a set of worker threads (default: 4) used
 -async methods[fs]
 These tasks are handed off to a thread pool thread, run there, and the result/callback is queued back onto the event queue when done.
 To change the size, set the UV_THREADPOOL_SIZE environment variable before the Node process starts .
+--------------------------------------
+6-
+blocking(synchronous): code runs directly on the call stack and must finish before anything else can execute . Example: fs.readFileSync(), heavy for loops, JSON.parse() on huge payloads. While this runs, the entire event loop is frozen ,no I/O, no timers, no other requests are processed.
+non-blocking(asynchronous): code hands the work off (to libuv) and immediately returns control to the call stack. The call stack keeps executing other code. When the async work finishes, its callback is queued and picked up by the event queue later. Example: fs.readFile(), http.get(), setTimeout().
