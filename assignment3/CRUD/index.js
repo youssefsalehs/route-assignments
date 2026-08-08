@@ -40,7 +40,7 @@ app
     if (!id) {
       return res.status(400).json({ message: " id must be included" });
     }
-    const requiredUser = await userRepository.getUserById(Number(id));
+    const requiredUser = await userRepository.getUserById(id);
     if (!requiredUser) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -49,11 +49,14 @@ app
   .patch(async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
-    const result = await userRepository.updateUser(Number(id), updates);
+    const result = await userRepository.updateUser(id, updates);
     return res.status(result.statusCode).json(result.message);
   });
 app.route("/user{/:id}").delete(async (req, res) => {
-  const id = Number(req.params.id || req.body.id);
+  const id = req.params.id || req.body.id;
+  if (!id) {
+    return res.status(400).json({ message: "id must be included" });
+  }
   const result = await userRepository.deleteUser(id);
   return res.status(result.statusCode).json({
     message: result.message,

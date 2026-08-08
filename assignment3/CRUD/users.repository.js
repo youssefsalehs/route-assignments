@@ -39,7 +39,7 @@ async function createUser(newUser) {
   if (alreadyExists) {
     return { message: "Email Already Exists", statusCode: 400 };
   } else {
-    const newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
+    const newId = crypto.randomUUID();
     newUser.id = newId;
     users.push(newUser);
     await fs.writeFile("./users.json", JSON.stringify(users), "utf-8");
