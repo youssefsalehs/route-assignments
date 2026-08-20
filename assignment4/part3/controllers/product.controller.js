@@ -170,10 +170,123 @@ async function deleteProduct(req, res) {
     client.release();
   }
 }
+async function createCategoryColumn(req, res) {
+  try {
+    await pool.query(`
+      ALTER TABLE product
+      ADD COLUMN category VARCHAR(100)
+    `);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Category column added successfully",
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+async function deleteCategoryColumn(req, res) {
+  try {
+    await pool.query(`
+      ALTER TABLE product
+      DROP COLUMN category 
+    `);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Category column deleted successfully",
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+async function addProductNameNotNull(req, res) {
+  const client = await pool.connect();
+
+  try {
+    await client.query(`
+      ALTER TABLE product
+      ALTER COLUMN name SET NOT NULL
+    `);
+
+    return res.status(200).json({
+      message: "Product name is now NOT NULL",
+    });
+  } catch (error) {
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+async function updateProductPriceByName(req, res) {
+  const { name, price } = req.body;
+  if (!name) {
+    const error = new Error("name must be included");
+    throw error;
+  }
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { rows: searchedProduct } = await client.query(
+      "select * from product where name = $1",
+      [name],
+    );
+    if (searchedProduct.length === 0) {
+      const error = new Error("no product found");
+      throw error;
+    }
+    const updatedPrice = price || searchedProduct[0].price;
+    if (updatedPrice < 0) {
+      const error = new Error("Price can't be negative");
+      throw error;
+    }
+    await client.query(" update  product set price = $1 where id = $2", [
+      updatedPrice,
+      searchedProduct[0].id,
+    ]);
+    await client.query("COMMIT");
+    return res.status(200).json({
+      status: "success",
+      message: `product ${searchedProduct[0].name} updated successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+async function deleteProductByName(req, res) {
+  const { name } = req.query;
+  try {
+    const { rows } = await pool.query(
+      "DELETE FROM product WHERE name = $1 RETURNING *",
+      [name],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        message: `Product ${name} not found`,
+      });
+    }
+
+    return res.status(204).json({
+      message: "Eggs deleted successfully",
+    });
+  } catch (error) {
+    throw error;
+  }
+}
 module.exports = {
   createProduct,
   updateProduct,
   getAllProducts,
   getProduct,
   deleteProduct,
+  createCategoryColumn,
+  deleteCategoryColumn,
+  addProductNameNotNull,
+  updateProductPriceByName,
+  deleteProductByName,
 };

@@ -1,7 +1,7 @@
 const pool = require("../config/dbConfig.js");
 
 async function createSupplier(req, res) {
-  const { name } = req.body;
+  const { name, phone } = req.body;
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -14,8 +14,8 @@ async function createSupplier(req, res) {
       throw error;
     }
     const { rows } = await client.query(
-      "insert into supplier (name) values ($1)",
-      [name],
+      "insert into supplier (name,contact_number) values ($1,$2)",
+      [name, phone],
     );
     await client.query("COMMIT");
     return res.status(201).json({
@@ -48,13 +48,8 @@ async function getAllSuppliers(req, res) {
   }
 }
 async function updateSupplier(req, res) {
-  const { name } = req.body;
-  if (!name) {
-    const error = new Error("name is a must");
-    throw error;
-  }
+  const { name, phone } = req.body;
   const supplierId = +req.params.supplierId;
-  console.log(supplierId, name);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -66,9 +61,11 @@ async function updateSupplier(req, res) {
       const error = new Error("supplier already exists");
       throw error;
     }
+    const updatedName = name || supplier[0].name;
+    const updatedPhone = phone || supplier[0]["contact_number"];
     const { rows } = await client.query(
-      "update supplier set name = $1 where id = $2 returning *",
-      [name, supplierId],
+      "UPDATE supplier SET name = $1, contact_number = $2 WHERE id = $2 RETURNING *",
+      [updatedName, updatedPhone, supplierId],
     );
     if (rows.length === 0) {
       const error = new Error("supplier not found");
@@ -115,9 +112,29 @@ async function deleteSupplier(req, res) {
     client.release();
   }
 }
+async function changeContactNumberType(req, res) {
+  const client = await pool.connect();
+
+  try {
+    await client.query(`
+      ALTER TABLE supplier
+      ALTER COLUMN contact_number TYPE VARCHAR(15)
+    `);
+
+    return res.status(200).json({
+      status: "success",
+      message: "ContactNumber changed to VARCHAR(15)",
+    });
+  } catch (error) {
+    throw error;
+  } finally {
+    client.release();
+  }
+}
 module.exports = {
   createSupplier,
   getAllSuppliers,
   updateSupplier,
   deleteSupplier,
+  changeContactNumberType,
 };

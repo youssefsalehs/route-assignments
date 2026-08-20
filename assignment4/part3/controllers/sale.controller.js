@@ -48,14 +48,39 @@ async function createSale(req, res) {
   }
 }
 async function getAllSales(req, res) {
-  const page = req.query.page || 1;
-  const limit = req.query.limit || 5;
+  const { productId } = req.params;
+
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 5;
   const offset = (page - 1) * limit;
+
   try {
-    const { rows } = await pool.query("select * from sale limit $1 offset $2", [
-      limit,
-      offset,
-    ]);
+    let query;
+    let values;
+
+    if (productId) {
+      query = `
+        SELECT *
+        FROM sale
+        WHERE product_id = $1
+        LIMIT $2
+        OFFSET $3
+      `;
+
+      values = [productId, limit, offset];
+    } else {
+      query = `
+        SELECT *
+        FROM sale
+        LIMIT $1
+        OFFSET $2
+      `;
+
+      values = [limit, offset];
+    }
+
+    const { rows } = await pool.query(query, values);
+
     return res.status(200).json({
       data: rows,
     });

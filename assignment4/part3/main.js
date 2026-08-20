@@ -7,6 +7,8 @@ const pool = require("./config/dbConfig");
 const productRouter = require("./routers/product.route");
 const supplierRouter = require("./routers/supplier.route");
 const saleRouter = require("./routers/sale.route");
+const initRouter = require("./routers/intialize.route");
+const reportRouter = require("./routers/report.route");
 app.use(express.json());
 app.get("/health", async (req, res) => {
   try {
@@ -18,9 +20,11 @@ app.get("/health", async (req, res) => {
       .json({ status: "error", db: "disconnected", message: err.message });
   }
 });
+app.use("/initialize-data", initRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/sale", saleRouter);
+app.use("/api/v1/report", reportRouter);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
