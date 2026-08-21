@@ -43,9 +43,22 @@ async function getNeverSoldProducts(req, res) {
 
   res.status(200).json({ data: rows });
 }
+async function getAllSales(req, res) {
+  const { rows } = await pool.query(`
+    select
+      p.name as product_name,
+     s.date as sale_date,
+      s.quantity as sale_quantity
+    from product p
+    right join sale s on p.id = s.product_id
+  `);
+
+  res.status(200).json({ data: rows });
+}
 module.exports = {
   getTotalSalesForProduct,
   getHighestStock,
   getSuppliersStartingWith,
   getNeverSoldProducts,
+  getAllSales,
 };
