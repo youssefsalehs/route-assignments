@@ -20,4 +20,31 @@ async function deletePost(req, res, next) {
     return next(error);
   }
 }
-module.exports = { createPost, deletePost };
+async function getAllPosts(req, res, next) {
+  try {
+    const posts = await postService.getPosts();
+
+    return res.status(200).json({
+      data: posts,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+async function getPostsAndCommentsCount(req, res, next) {
+  try {
+    const posts = await postService.getPostsAndCommentsCount();
+
+    return res.status(200).json({
+      data: posts,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+module.exports = {
+  createPost,
+  deletePost,
+  getAllPosts,
+  getPostsAndCommentsCount,
+};

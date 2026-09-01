@@ -2,6 +2,8 @@ const {
   createPost,
   findPostById,
   deletePost,
+  getAllPosts,
+  getAllPostsAndCommentsCount,
 } = require("./post.repository.js");
 
 async function createPostService(userId, data) {
@@ -33,4 +35,22 @@ async function deletePostService(userId, postId) {
 
   return deletePost;
 }
-module.exports = { createPostService, deletePostService };
+async function getPosts() {
+  const posts = await getAllPosts();
+  return posts;
+}
+async function getPostsAndCommentsCount() {
+  const posts = await getAllPostsAndCommentsCount();
+  const formattedPosts = posts.map((post) => ({
+    id: post.id,
+    title: post.title,
+    commentsCount: post._count.comments,
+  }));
+  return formattedPosts;
+}
+module.exports = {
+  createPostService,
+  deletePostService,
+  getPosts,
+  getPostsAndCommentsCount,
+};
