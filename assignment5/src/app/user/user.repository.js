@@ -17,4 +17,10 @@ const upsertUser = async (userId, data) => {
     },
   });
 };
-module.exports = { findUserById, upsertUser };
+async function getExistingUsers(userIds) {
+  return await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true },
+  });
+}
+module.exports = { findUserById, upsertUser, getExistingUsers };
