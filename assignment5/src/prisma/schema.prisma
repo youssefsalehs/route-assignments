@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum user_role {
+  user
+  admin
+}
+model User{
+id Int @id @default(autoincrement())
+name String @db.VarChar(255)
+email String @unique
+password String @db.VarChar(255) @map("password_hash")
+role user_role @default(user)
+createdAt DateTime @default(now()) @map("created_at")
+updatedAt DateTime @updatedAt @map("updated_at")
+posts Post[]
+comments Comment[]
+@@map("users")
+}
+model Post{
+  id Int @id @default(autoincrement())
+  title String @db.VarChar(255)
+  content String
+  userId Int @map("user_id")
+  user User @relation(fields:[userId],references: [id])
+  comments Comment[]
+createdAt DateTime @default(now()) @map("created_at")
+updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("posts")
+}
+model Comment{
+    id Int @id @default(autoincrement())
+  content String
+  userId Int @map("user_id")
+  postId Int @map("post_id")
+  user User @relation(fields: [userId],references: [id])
+  post Post @relation(fields: [postId],references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("comments")
+}
