@@ -56,9 +56,29 @@ async function getCommentsContainWord(req, res, next) {
     return next(error);
   }
 }
+async function getTop3NewestCommentsForPost(req, res, next) {
+  try {
+    const { postId } = req.params;
+    const comments = await commentService.getTop3NewestCommentsForPost(+postId);
+    return res.status(200).json(comments);
+  } catch (error) {
+    return next(error);
+  }
+}
+async function getCommentDetails(req, res, next) {
+  try {
+    const id = +req.params.id;
+    const comment = await commentService.getCommentDetails(id);
+    return res.status(200).json(comment);
+  } catch (error) {
+    return next(error);
+  }
+}
 module.exports = {
   createBulkComments,
   updateComment,
   findOrCreateComment,
   getCommentsContainWord,
+  getTop3NewestCommentsForPost,
+  getCommentDetails,
 };

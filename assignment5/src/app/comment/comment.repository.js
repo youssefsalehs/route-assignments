@@ -48,6 +48,34 @@ async function getCommentsContainWord(word) {
     },
   });
 }
+async function findTop3NewestCommentsForPost(postId) {
+  return await prisma.comment.findMany({
+    where: {
+      postId,
+    },
+    take: 3,
+    orderBy: { createdAt: "desc" },
+  });
+}
+async function findCommentByIdWithUserAndPost(id) {
+  return prisma.comment.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      content: true,
+      post: { select: { id: true, title: true, content: true } },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
 module.exports = {
   findCommentById,
   bulkCreateComments,
@@ -55,4 +83,6 @@ module.exports = {
   createComment,
   findCommentByContentAndPostId,
   getCommentsContainWord,
+  findTop3NewestCommentsForPost,
+  findCommentByIdWithUserAndPost,
 };

@@ -49,4 +49,4 @@ function checkPasswordLength(password) {
     throw error;
   }
 }
-module.exports = { signup, login };
+module.exports = { signup, login, checkPasswordLength };

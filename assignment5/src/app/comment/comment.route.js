@@ -10,4 +10,9 @@ commentRouter.post(
   commentController.findOrCreateComment,
 );
 commentRouter.get("/search", commentController.getCommentsContainWord);
+commentRouter.get(
+  "/newest/:postId",
+  commentController.getTop3NewestCommentsForPost,
+);
+commentRouter.get("/details/:id", commentController.getCommentDetails);
 module.exports = commentRouter;

@@ -93,9 +93,31 @@ async function getCommentsContainWord(word) {
   const comments = await commentRepository.getCommentsContainWord(word);
   return comments;
 }
+async function getTop3NewestCommentsForPost(postId) {
+  const comments =
+    await commentRepository.findTop3NewestCommentsForPost(postId);
+  return comments;
+}
+async function getCommentDetails(commentId) {
+  if (!commentId) {
+    throw new Error("Comment ID is required");
+  }
+
+  const comment =
+    await commentRepository.findCommentByIdWithUserAndPost(commentId);
+  if (!comment) {
+    const error = new Error("Comment not found");
+    error.status = 404;
+    throw error;
+  }
+
+  return comment;
+}
 module.exports = {
   createBulkComments,
   updateComment,
   findOrCreateComment,
   getCommentsContainWord,
+  getTop3NewestCommentsForPost,
+  getCommentDetails,
 };

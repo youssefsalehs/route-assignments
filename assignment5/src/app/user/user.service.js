@@ -1,4 +1,5 @@
 const { findUserByEmail } = require("../auth/auth.repository");
+const { checkPasswordLength } = require("../auth/auth.service");
 const { findUserById, upsertUser } = require("./user.repository");
 const bcrypt = require("bcrypt");
 const getUserByEmail = async (email) => {
